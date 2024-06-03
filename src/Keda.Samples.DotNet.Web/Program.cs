@@ -1,25 +1,34 @@
-using Microsoft.AspNetCore.Hosting;
+using Keda.Samples.Dotnet.Contracts;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Keda.Samples.DotNet.Web
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
-                    {
-                        loggingBuilder.AddConsole(consoleLoggerOptions => consoleLoggerOptions.TimestampFormat = "[HH:mm:ss]");
-                    });
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+builder.Services.AddLogging(builder => builder.AddConsole());
+builder.Services.AddControllers();
+builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+builder.Services.AddSwagger();
+builder.Services.AddOrderQueueServices();
+
+
+var app = builder.Build();
+if (app.Environment.IsDevelopment())app.UseDeveloperExceptionPage();
+else app.UseExceptionHandler("/Error");
+
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+app.MapRazorPages();
+app.MapControllers();
+
+app.UseSwagger();
+app.UseSwaggerUI(swaggerUiOptions =>
+{
+    swaggerUiOptions.SwaggerEndpoint("v1/swagger.json", "Keda.Samples.Dotnet.API");
+    swaggerUiOptions.DocumentTitle = "KEDA API";
+});
+
+await app.RunAsync();

@@ -1,47 +1,34 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using GuardNet;
+using Azure.Messaging.ServiceBus;
 using Keda.Samples.Dotnet.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.ServiceBus;
-using Newtonsoft.Json;
 
-namespace Keda.Samples.DotNet.Web.Controllers
+namespace Keda.Samples.DotNet.Web.Controllers;
+
+/// <summary>
+///     API endpoint to manage orders
+/// </summary>
+[ApiController]
+[Route("api/v1/orders")]
+public class OrdersController : ControllerBase
 {
+
     /// <summary>
-    ///     API endpoint to manage orders
+    ///     Create Order
     /// </summary>
-    [ApiController]
-    [Route("api/v1/orders")]
-    public class OrdersController : ControllerBase
+    [HttpPost(Name = "Order_Create")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody, Required] Order order, [FromServices] ServiceBusSender sender, CancellationToken ct)
     {
-        private readonly QueueClient _queueClient;
+        var jsonString = JsonSerializer.Serialize(order);
+        var orderMessage = new ServiceBusMessage(jsonString);
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="queueClient">Client to send messages to queue with</param>
-        public OrdersController(QueueClient queueClient)
-        {
-            Guard.NotNull(queueClient, nameof(queueClient));
+        await sender.SendMessageAsync(orderMessage, ct);
 
-            _queueClient = queueClient;
-        }
-
-        /// <summary>
-        ///     Create Order
-        /// </summary>
-        [HttpPost(Name = "Order_Create")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody, Required] Order order)
-        {
-            var rawOrder = JsonConvert.SerializeObject(order);
-            var orderMessage = new Message(Encoding.UTF8.GetBytes(rawOrder));
-            await _queueClient.SendAsync(orderMessage);
-
-            return Accepted();
-        }
+        return Accepted();
     }
 }

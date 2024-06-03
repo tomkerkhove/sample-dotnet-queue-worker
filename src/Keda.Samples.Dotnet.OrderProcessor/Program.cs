@@ -1,30 +1,10 @@
-using Microsoft.Extensions.Configuration;
+using Keda.Samples.Dotnet.Contracts;
+using Keda.Samples.Dotnet.OrderProcessor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace Keda.Samples.Dotnet.OrderProcessor
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = Host.CreateApplicationBuilder();
+builder.Services.AddOrderQueueServices();
+builder.Services.AddHostedService<OrdersQueueProcessor>();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.AddEnvironmentVariables();
-                })
-                .ConfigureLogging((hostBuilderContext, loggingBuilder) =>
-                {
-                    loggingBuilder.AddConsole(consoleLoggerOptions => consoleLoggerOptions.TimestampFormat = "[HH:mm:ss]");
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddHostedService<OrdersQueueProcessor>();
-                });
-    }
-}
+builder.Build().Run();

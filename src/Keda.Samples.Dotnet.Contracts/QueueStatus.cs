@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿namespace Keda.Samples.Dotnet.Contracts;
 
-namespace Keda.Samples.Dotnet.Contracts
+public class QueueStatus
 {
-    public class QueueStatus
-    {
-        [JsonProperty]
-        public long MessageCount { get; set; }
-    }
+    public long MessageCount { get; set; }
 }

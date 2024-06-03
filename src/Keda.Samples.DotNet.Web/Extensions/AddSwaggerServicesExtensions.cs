@@ -4,9 +4,9 @@ using Microsoft.OpenApi.Models;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class IServiceCollectionExtensions
+    public static class AddSwaggerServicesExtensions
     {
-        public static IServiceCollection AddSwagger(this IServiceCollection services)
+        public static void AddSwagger(this IServiceCollection services)
         {
             var openApiInformation = new OpenApiInfo
             {
@@ -20,8 +20,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 swaggerGenerationOptions.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
                     "Keda.Samples.DotNet.Web.Open-Api.xml"));
             });
-
-            return services;
         }
     }
 }

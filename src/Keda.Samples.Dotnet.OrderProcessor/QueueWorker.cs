@@ -1,124 +1,83 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
-namespace Keda.Samples.Dotnet.OrderProcessor
+namespace Keda.Samples.Dotnet.OrderProcessor;
+
+public abstract class QueueWorker<TMessage>(
+    IServiceScopeFactory serviceScopeFactory,
+    ILogger<QueueWorker<TMessage>> logger)
+    : BackgroundService
 {
-    public abstract class QueueWorker<TMessage> : BackgroundService
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        protected ILogger<QueueWorker<TMessage>> Logger { get; }
-        protected IConfiguration Configuration { get; }
-
-        protected QueueWorker(IConfiguration configuration, ILogger<QueueWorker<TMessage>> logger)
-        {
-            Configuration = configuration;
-            Logger = logger;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            var queueName = Configuration.GetValue<string>("KEDA_SERVICEBUS_QUEUE_NAME");
-            var messageProcessor = CreateServiceBusProcessor(queueName);
-            messageProcessor.ProcessMessageAsync += HandleMessageAsync;
-            messageProcessor.ProcessErrorAsync += HandleReceivedExceptionAsync;
+        using var scope = serviceScopeFactory.CreateScope();
+        
+        var messageProcessor = scope.ServiceProvider.GetRequiredService<ServiceBusProcessor>();
             
-            Logger.LogInformation($"Starting message pump on queue {queueName} in namespace {messageProcessor.FullyQualifiedNamespace}");
-            await messageProcessor.StartProcessingAsync(stoppingToken);
-            Logger.LogInformation("Message pump started");
+        messageProcessor.ProcessMessageAsync += HandleMessageAsync;
+        messageProcessor.ProcessErrorAsync += HandleReceivedExceptionAsync;
 
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
+        logger.LogInformation($"Starting message pump on queue {messageProcessor.EntityPath} in namespace {messageProcessor.FullyQualifiedNamespace}");
+        await messageProcessor.StartProcessingAsync(stoppingToken);
+        logger.LogInformation("Message pump started");
 
-            Logger.LogInformation("Closing message pump");
-            await messageProcessor.CloseAsync(cancellationToken: stoppingToken);
-            Logger.LogInformation("Message pump closed : {Time}", DateTimeOffset.UtcNow);
-        }
-
-        private ServiceBusProcessor CreateServiceBusProcessor(string queueName)
+        while (!stoppingToken.IsCancellationRequested)
         {
-            var serviceBusClient = AuthenticateToAzureServiceBus();
-            var messageProcessor = serviceBusClient.CreateProcessor(queueName);
-            return messageProcessor;
+            await Task.Delay(TimeSpan.FromSeconds(1));
         }
 
-        private ServiceBusClient AuthenticateToAzureServiceBus()
-        {
-            var authenticationMode = Configuration.GetValue<AuthenticationMode>("KEDA_SERVICEBUS_AUTH_MODE");
-            
-            ServiceBusClient serviceBusClient;
-
-            switch (authenticationMode)
-            {
-                case AuthenticationMode.ConnectionString:
-                    Logger.LogInformation($"Authentication by using connection string");
-                    serviceBusClient = ServiceBusClientFactory.CreateWithConnectionStringAuthentication(Configuration);
-                    break;
-                case AuthenticationMode.ServicePrinciple:
-                    Logger.LogInformation("Authentication by using service principle");
-                    serviceBusClient = ServiceBusClientFactory.CreateWithServicePrincipleAuthentication(Configuration);
-                    break;
-                case AuthenticationMode.PodIdentity:
-                    Logger.LogInformation("Authentication by using pod identity");
-                    serviceBusClient = ServiceBusClientFactory.CreateWithPodIdentityAuthentication(Configuration, Logger);
-                    break;
-                case AuthenticationMode.WorkloadIdentity:
-                    Logger.LogInformation("Authentication by using workload identity");
-                    serviceBusClient = ServiceBusClientFactory.CreateWithWorkloadIdentityAuthentication(Configuration, Logger);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return serviceBusClient;
-        }
-
-        private async Task HandleMessageAsync (ProcessMessageEventArgs processMessageEventArgs)
-        {
-            try
-            {
-                var rawMessageBody = Encoding.UTF8.GetString(processMessageEventArgs.Message.Body.ToBytes().ToArray());
-                Logger.LogInformation("Received message {MessageId} with body {MessageBody}",
-                    processMessageEventArgs.Message.MessageId, rawMessageBody);
-
-                var order = JsonConvert.DeserializeObject<TMessage>(rawMessageBody);
-                if (order != null)
-                {
-                    await ProcessMessage(order, processMessageEventArgs.Message.MessageId,
-                        processMessageEventArgs.Message.ApplicationProperties,
-                        processMessageEventArgs.CancellationToken);
-                }
-                else
-                {
-                    Logger.LogError(
-                        "Unable to deserialize to message contract {ContractName} for message {MessageBody}",
-                        typeof(TMessage), rawMessageBody);
-                }
-
-                Logger.LogInformation("Message {MessageId} processed", processMessageEventArgs.Message.MessageId);
-
-                await processMessageEventArgs.CompleteMessageAsync(processMessageEventArgs.Message);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Unable to handle message");
-            }
-        }
-
-        private Task HandleReceivedExceptionAsync(ProcessErrorEventArgs exceptionEvent)
-        {
-            Logger.LogError(exceptionEvent.Exception, "Unable to process message");
-            return Task.CompletedTask;
-        }
-
-        protected abstract Task ProcessMessage(TMessage order, string messageId, IReadOnlyDictionary<string, object> userProperties, CancellationToken cancellationToken);
+        logger.LogInformation("Closing message pump");
+        await messageProcessor.CloseAsync(cancellationToken: stoppingToken);
+        logger.LogInformation("Message pump closed : {Time}", DateTimeOffset.UtcNow);
     }
+
+        
+    private async Task HandleMessageAsync (ProcessMessageEventArgs processMessageEventArgs)
+    {
+        try
+        {
+            var rawMessageBody = Encoding.UTF8.GetString(processMessageEventArgs.Message.Body);
+            logger.LogInformation("Received message {MessageId} with body {MessageBody}",
+                processMessageEventArgs.Message.MessageId, rawMessageBody);
+
+            var order = JsonSerializer.Deserialize<TMessage>(rawMessageBody);
+            if (order != null)
+            {
+                await ProcessMessage(order, processMessageEventArgs.Message.MessageId,
+                    processMessageEventArgs.Message.ApplicationProperties,
+                    processMessageEventArgs.CancellationToken);
+            }
+            else
+            {
+                logger.LogError(
+                    "Unable to deserialize to message contract {ContractName} for message {MessageBody}",
+                    typeof(TMessage), rawMessageBody);
+            }
+
+            logger.LogInformation("Message {MessageId} processed", processMessageEventArgs.Message.MessageId);
+
+            await processMessageEventArgs.CompleteMessageAsync(processMessageEventArgs.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to handle message");
+        }
+    }
+
+    private Task HandleReceivedExceptionAsync(ProcessErrorEventArgs exceptionEvent)
+    {
+        logger.LogError(exceptionEvent.Exception, "Unable to process message");
+        return Task.CompletedTask;
+    }
+
+    protected abstract Task ProcessMessage(TMessage order, string messageId, IReadOnlyDictionary<string, object> userProperties, CancellationToken cancellationToken);
 }
