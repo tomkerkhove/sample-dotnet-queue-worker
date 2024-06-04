@@ -26,7 +26,6 @@ public class OrdersController : ControllerBase
     {
         var jsonString = JsonSerializer.Serialize(order);
         var orderMessage = new ServiceBusMessage(jsonString);
-
         await sender.SendMessageAsync(orderMessage, ct);
 
         return Accepted();

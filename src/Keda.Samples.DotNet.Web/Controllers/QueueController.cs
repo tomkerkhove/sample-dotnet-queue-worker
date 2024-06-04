@@ -12,10 +12,7 @@ namespace Keda.Samples.DotNet.Web.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public QueueStatus Get([FromServices] ServiceBusReceiver  receiver)
         {
-            return new QueueStatus
-            {
-                MessageCount = receiver.PrefetchCount
-            };
+            return new QueueStatus(receiver.PrefetchCount);
         }
     }
 }

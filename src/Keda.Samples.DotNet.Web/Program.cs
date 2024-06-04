@@ -1,5 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using Azure.Messaging.ServiceBus;
 using Keda.Samples.Dotnet.Contracts;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -30,5 +34,6 @@ app.UseSwaggerUI(swaggerUiOptions =>
     swaggerUiOptions.SwaggerEndpoint("v1/swagger.json", "Keda.Samples.Dotnet.API");
     swaggerUiOptions.DocumentTitle = "KEDA API";
 });
+
 
 await app.RunAsync();
