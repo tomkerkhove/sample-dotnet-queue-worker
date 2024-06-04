@@ -5,29 +5,21 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Keda.Samples.Dotnet.OrderProcessor;
 
-public abstract class QueueWorker<TMessage>(
-    IServiceScopeFactory serviceScopeFactory,
-    ILogger<QueueWorker<TMessage>> logger)
-    : BackgroundService
+public abstract class QueueWorker<TMessage>(ServiceBusProcessor processor, ILogger<QueueWorker<TMessage>> logger) : BackgroundService
 {
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var scope = serviceScopeFactory.CreateScope();
-        
-        var messageProcessor = scope.ServiceProvider.GetRequiredService<ServiceBusProcessor>();
-            
-        messageProcessor.ProcessMessageAsync += HandleMessageAsync;
-        messageProcessor.ProcessErrorAsync += HandleReceivedExceptionAsync;
+        processor.ProcessMessageAsync += HandleMessageAsync;
+        processor.ProcessErrorAsync += HandleReceivedExceptionAsync;
 
-        logger.LogInformation($"Starting message pump on queue {messageProcessor.EntityPath} in namespace {messageProcessor.FullyQualifiedNamespace}");
-        await messageProcessor.StartProcessingAsync(stoppingToken);
+        logger.LogInformation($"Starting message pump on queue {processor.EntityPath} in namespace {processor.FullyQualifiedNamespace}");
+        await processor.StartProcessingAsync(stoppingToken);
         logger.LogInformation("Message pump started");
 
         while (!stoppingToken.IsCancellationRequested)
@@ -36,7 +28,8 @@ public abstract class QueueWorker<TMessage>(
         }
 
         logger.LogInformation("Closing message pump");
-        await messageProcessor.CloseAsync(cancellationToken: stoppingToken);
+        await processor.CloseAsync(CancellationToken.None);
+        await processor.DisposeAsync();
         logger.LogInformation("Message pump closed : {Time}", DateTimeOffset.UtcNow);
     }
 

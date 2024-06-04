@@ -10,8 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Keda.Samples.Dotnet.OrderProcessor
 {
-    public class OrdersQueueProcessor(IServiceScopeFactory factory, ILogger<OrdersQueueProcessor> logger)
-        : QueueWorker<Order>(factory, logger)
+    public class OrdersQueueProcessor(ServiceBusProcessor processor, ILogger<OrdersQueueProcessor> logger) : QueueWorker<Order>(processor, logger)
     {
         protected override async Task ProcessMessage(Order order, string messageId, IReadOnlyDictionary<string, object> userProperties, CancellationToken cancellationToken)
         {

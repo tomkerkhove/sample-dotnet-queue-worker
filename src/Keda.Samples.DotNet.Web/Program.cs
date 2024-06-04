@@ -5,8 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder();
-
-builder.Services.AddLogging(builder => builder.AddConsole());
+builder.Services.AddOptions<OrderQueueOptions>().BindConfiguration(nameof(OrderQueueOptions));
+builder.Services.AddLogging(lb => lb.AddConsole());
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();

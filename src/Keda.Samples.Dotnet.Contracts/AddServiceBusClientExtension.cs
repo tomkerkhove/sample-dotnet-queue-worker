@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
@@ -45,6 +44,9 @@ public static class AddServiceBusClientExtension
     {
         switch (options.AuthMode)
         {
+            case AuthenticationMode.AzureDefaultCredential:
+                logger.LogInformation($"Authentication with Azure Default Credential");
+                return new ServiceBusClient(options.FullyQualifiedNamespace, new DefaultAzureCredential());
             case AuthenticationMode.ConnectionString:
                 logger.LogInformation($"Authentication by using connection string");
                 return new ServiceBusClient(options.ConnectionString);
@@ -65,10 +67,11 @@ public static class AddServiceBusClientExtension
 
 public enum AuthenticationMode
 {
+    AzureDefaultCredential,
     ConnectionString,
     ServicePrinciple,
     PodIdentity,
-    WorkloadIdentity
+    WorkloadIdentity,
 }
 public class OrderQueueOptions
 {
@@ -76,8 +79,9 @@ public class OrderQueueOptions
     public AuthenticationMode AuthMode { get; set; }
     [Required]
     public string QueueName { get; set; }
-    
+
     public string ConnectionString { get; set; }
+    [Required]
     public string FullyQualifiedNamespace { get; set;}
     public string TenantId { get; set;}
     public string ClientId { get; set;}

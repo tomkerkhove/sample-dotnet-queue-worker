@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder();
-builder.Services.Configure<OrderQueueOptions>(builder.Configuration.GetSection(key: nameof(OrderQueueOptions)));
+builder.Services.AddOptions<OrderQueueOptions>().Bind(builder.Configuration.GetSection(nameof(OrderQueueOptions)));
 builder.Services.AddOrderQueueServices();
 var app = builder.Build();
 var sender = app.Services.GetRequiredService<ServiceBusSender>();
