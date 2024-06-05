@@ -16,4 +16,5 @@ RUN dotnet publish "Keda.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /ap
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+USER 1000
 ENTRYPOINT ["dotnet", "Keda.Samples.Dotnet.OrderProcessor.dll"]
