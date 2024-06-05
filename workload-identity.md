@@ -413,7 +413,7 @@ Run the following command with app ids of both created Azure AD applications.
 ```cli
 ❯ az ad app delete --id <app-id>
 ```
-
+ 
 ### Uninstall KEDA
 
 ```cli
