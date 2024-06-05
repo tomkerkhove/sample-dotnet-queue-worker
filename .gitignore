@@ -11,7 +11,8 @@
 */**/appsettings.local.json
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
-
+.terraform*
+terraform.tfstate*
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
