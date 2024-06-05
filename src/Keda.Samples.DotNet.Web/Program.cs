@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using System.Threading;
 using Azure.Messaging.ServiceBus;
 using Keda.Samples.Dotnet.Contracts;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,7 +16,8 @@ builder.Services.AddLogging(lb => lb.AddConsole());
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
-builder.Services.AddSwagger();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOrderQueueServices();
 
 
@@ -26,14 +29,21 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.MapRazorPages();
-app.MapControllers();
-
 app.UseSwagger();
-app.UseSwaggerUI(swaggerUiOptions =>
-{
-    swaggerUiOptions.SwaggerEndpoint("v1/swagger.json", "Keda.Samples.Dotnet.API");
-    swaggerUiOptions.DocumentTitle = "KEDA API";
-});
+app.UseSwaggerUI();
 
+app.MapGet("/api/v1/queue",
+    async ([FromServices] ServiceBusReceiver receiver, CancellationToken ct) =>
+    new QueueStatus((await receiver.PeekMessagesAsync(100, null, ct)).Count));
+
+app.MapPost("api/v1/orders",
+    async ([FromBody, Required] Order order, [FromServices] ServiceBusSender sender, CancellationToken ct) =>
+    {
+        var jsonString = JsonSerializer.Serialize(order);
+        var orderMessage = new ServiceBusMessage(jsonString);
+        await sender.SendMessageAsync(orderMessage, ct);
+
+        return TypedResults.Accepted(order.Id);
+    }).WithName("Order_Create");
 
 await app.RunAsync();

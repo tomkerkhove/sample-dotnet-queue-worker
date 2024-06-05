@@ -6,7 +6,6 @@
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>858adc6c-c378-4698-a3c4-1112a29d6561</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>Keda.Samples.DotNet.Web.Open-Api.xml</DocumentationFile>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
