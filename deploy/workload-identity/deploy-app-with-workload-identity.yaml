@@ -28,9 +28,9 @@ spec:
       - name: order-processor
         image: ghcr.io/kedacore/sample-dotnet-worker-servicebus-queue:latest
         env:
-        - name: KEDA_SERVICEBUS_AUTH_MODE
+        - name: OrderQueueOptions__AuthMode
           value: WorkloadIdentity
-        - name: KEDA_SERVICEBUS_HOST_NAME
+        - name: OrderQueueOptions__FullyQualifiedNamespace
           value: <namespace-name>.servicebus.windows.net
-        - name: KEDA_SERVICEBUS_QUEUE_NAME
+        - name: OrderQueueOptions__QueueName
           value: orders

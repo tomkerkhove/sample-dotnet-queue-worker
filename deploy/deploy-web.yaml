@@ -17,18 +17,23 @@ spec:
       - name: order-web
         image: ghcr.io/kedacore/sample-dotnet-worker-servicebus-portal
         env:
-        - name: KEDA_SERVICEBUS_QUEUE_CONNECTIONSTRING
+          - name: OrderQueueOptions__AuthMode
+            value: ConnectionString
+        env:
+        - name: OrderQueueOptions__ConnectionString
           valueFrom:
             secretKeyRef:
              name: secrets-order-portal
              key: servicebus-connectionstring
+        - name: OrderQueueOptions__QueueName
+          value: orders
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: kedasampleweb
   labels:
-    app: order-web  
+    app: order-web
   annotations:
     # Expose service on <label-name>.<location>.cloudapp.azure.com
     service.beta.kubernetes.io/azure-dns-label-name: keda-orders-portal

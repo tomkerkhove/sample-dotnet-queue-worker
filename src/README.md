@@ -1,9 +1,9 @@
 # .NET Order Processor
 This contains the sources of the sample:
-- `Keda.Samples.Dotnet.Contracts` contains the message contracts
+- `Keda.Samples.Dotnet.Contracts` contains the message contracts and ServiceBus DI helper
 - `Keda.Samples.Dotnet.OrderGenerator` is a utility that queues new orders to an Azure Service Bus Queue
-- `Keda.Samples.Dotnet.OrderProcessor` is a .NET Core 3.0 worker that processes orders from an Azure Service Bus Queue
-- `Keda.Samples.Dotnet.OrderWeb` is a ASP.NET Core 3.0 web app that visualizes the size of the service bus queue
+- `Keda.Samples.Dotnet.OrderProcessor` is a .NET 8.0 worker that processes orders from an Azure Service Bus Queue
+- `Keda.Samples.Dotnet.OrderWeb` is a ASP.NET 8.0 web app that visualizes the size of the service bus queue
 
 ## Building & Running the sample locally on Docker
 
@@ -15,13 +15,13 @@ Build Docker container for order processor
 
 Run order processor locally
 ```shell
-❯ docker run --detach --env KEDA_SERVICEBUS_QUEUE_CONNECTIONSTRING="<connection-string>" keda-sample-dotnet-worker-servicebus-queue
+❯ docker run --detach --env OrderQueueOptions__ConnectionString="<connection-string>" keda-sample-dotnet-worker-servicebus-queue
 c6775c9383e56fc16da37b62ebbff0dc44d4019a53d282a1ef260a6d71022a32
 ```
 
 Let's use the test orders via our `OrderGenerator` tool:
 ```shell
-❯ dotnet run --project .\Keda.Samples.Dotnet.OrderGenerator\Keda.Samples.Dotnet.OrderGenerator.csproj
+❯ OrderQueueOptions__ConnectionString="<connection-string>" dotnet run --project .\Keda.Samples.Dotnet.OrderGenerator\Keda.Samples.Dotnet.OrderGenerator.csproj
 Let's queue some orders, how many do you want?
 2
 Queuing order 719a7b19-f1f7-4f46-a543-8da9bfaf843d - A Hat for Reilly Davis

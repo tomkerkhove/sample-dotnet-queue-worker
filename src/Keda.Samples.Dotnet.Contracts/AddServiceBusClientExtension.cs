@@ -22,19 +22,19 @@ public static class AddServiceBusClientExtension
         {
             var client = svc.GetRequiredService<ServiceBusClient>();
             var options = svc.GetRequiredService<IOptions<OrderQueueOptions>>();
-            return client.CreateReceiver(options.Value.QueueName);
+            return client.CreateReceiver(options.Value.GetEntityPath());
         });
         services.AddScoped<ServiceBusSender>(svc =>
         {
             var client = svc.GetRequiredService<ServiceBusClient>();
             var options = svc.GetRequiredService<IOptions<OrderQueueOptions>>();
-            return client.CreateSender(options.Value.QueueName);
+            return client.CreateSender(options.Value.GetEntityPath());
         });
         services.AddScoped<ServiceBusProcessor>(svc =>
         {
             var client = svc.GetRequiredService<ServiceBusClient>();
             var options = svc.GetRequiredService<IOptions<OrderQueueOptions>>();
-            return client.CreateProcessor(options.Value.QueueName);
+            return client.CreateProcessor(options.Value.GetEntityPath());
         });
 
         return services;
@@ -42,6 +42,9 @@ public static class AddServiceBusClientExtension
 
     private static ServiceBusClient AuthenticateToAzureServiceBus(OrderQueueOptions options, ILogger logger)
     {
+        Console.WriteLine(options.AuthMode);
+        Console.WriteLine(options.ConnectionString);
+        Console.WriteLine(options.QueueName);
         switch (options.AuthMode)
         {
             case AuthenticationMode.AzureDefaultCredential:
@@ -67,11 +70,11 @@ public static class AddServiceBusClientExtension
 
 public enum AuthenticationMode
 {
-    AzureDefaultCredential,
     ConnectionString,
     ServicePrinciple,
     PodIdentity,
     WorkloadIdentity,
+    AzureDefaultCredential,
 }
 public class OrderQueueOptions
 {
@@ -86,4 +89,12 @@ public class OrderQueueOptions
     public string TenantId { get; set;}
     public string ClientId { get; set;}
     public string ClientSecret { get; set;}
+
+    public string GetEntityPath()
+    {
+        if (AuthMode != AuthenticationMode.ConnectionString) return QueueName;
+
+        var sb = ServiceBusConnectionStringProperties.Parse(ConnectionString);
+        return sb.EntityPath;
+    }
 }
