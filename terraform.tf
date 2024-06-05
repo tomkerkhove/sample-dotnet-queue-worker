@@ -11,7 +11,7 @@ locals {
   queue_name      = "orders"
   managed_id_name = "radix-sample-keda"
 
-  radix_app_name        = "edc2023-radix-wi-rihag"
+  radix_app_name        = "radix-keda-sample"
   radix_app_env         = "prod"
   radix_oidc_issuer_url = "https://northeurope.oic.prod-aks.azure.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/04f44167-e128-4c51-a26c-2589bd33b7ac/"
 }
@@ -26,6 +26,7 @@ output "queue_name" {
   value = local.queue_name
 }
 
+### Set up Service Bus and queue
 
 resource "azurerm_servicebus_namespace" "main" {
   location            = local.location
@@ -39,6 +40,8 @@ resource "azurerm_servicebus_queue" "main" {
   namespace_id = azurerm_servicebus_namespace.main.id
 }
 
+### Configure User Assigned Identity, Role Assignments and federated credentials
+
 resource "azurerm_user_assigned_identity" "main" {
   name                = local.managed_id_name
   location            = azurerm_servicebus_namespace.main.location
@@ -49,15 +52,6 @@ resource "azurerm_role_assignment" "main" {
   principal_id         = azurerm_user_assigned_identity.main.principal_id
   scope                = azurerm_servicebus_namespace.main.id
   role_definition_name = "Azure Service Bus Data Owner"
-}
-
-resource "azurerm_federated_identity_credential" "keda" {
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = local.radix_oidc_issuer_url
-  name                = "keda"
-  resource_group_name = azurerm_servicebus_namespace.main.resource_group_name
-  subject             = "system:serviceaccount:keda:keda-operator"
-  parent_id           = azurerm_user_assigned_identity.main.id
 }
 
 resource "azurerm_federated_identity_credential" "web" {
@@ -75,5 +69,15 @@ resource "azurerm_federated_identity_credential" "processor" {
   name                = "processor"
   resource_group_name = azurerm_servicebus_namespace.main.resource_group_name
   subject             = "system:serviceaccount:${local.radix_app_name}-${local.radix_app_env}:processor-sa"
+  parent_id           = azurerm_user_assigned_identity.main.id
+}
+
+# Add access for Keda Operator to access the queue
+resource "azurerm_federated_identity_credential" "keda" {
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = local.radix_oidc_issuer_url
+  name                = "keda"
+  resource_group_name = azurerm_servicebus_namespace.main.resource_group_name
+  subject             = "system:serviceaccount:keda:keda-operator"
   parent_id           = azurerm_user_assigned_identity.main.id
 }
