@@ -6,9 +6,10 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 var builder = Host.CreateApplicationBuilder();
-builder.Configuration.AddJsonFile("appsettings.local.json", optional: true).AddEnvironmentVariables();
+builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
 builder.Services.AddOptions<OrderQueueOptions>().Bind(builder.Configuration.GetSection(nameof(OrderQueueOptions)));
 builder.Services.AddOrderQueueServices();
 var app = builder.Build();

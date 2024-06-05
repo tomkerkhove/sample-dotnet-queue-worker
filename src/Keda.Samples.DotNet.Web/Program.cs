@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder();
-builder.Configuration.AddJsonFile("appsettings.local.json", optional: true).AddEnvironmentVariables();
+builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
 builder.Services.AddOptions<OrderQueueOptions>().BindConfiguration(nameof(OrderQueueOptions));
 builder.Services.AddLogging(lb => lb.AddConsole());
 builder.Services.AddControllers();
