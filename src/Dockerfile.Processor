@@ -1,6 +1,3 @@
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-WORKDIR /app
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["Keda.Samples.Dotnet.OrderProcessor/Keda.Samples.Dotnet.OrderProcessor.csproj", "Keda.Samples.Dotnet.OrderProcessor/"]
@@ -13,7 +10,7 @@ RUN dotnet build "Keda.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /app
 FROM build AS publish
 RUN dotnet publish "Keda.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /app
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=publish /app .
 USER 1000
