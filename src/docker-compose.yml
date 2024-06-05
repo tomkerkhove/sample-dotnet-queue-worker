@@ -5,7 +5,7 @@ services:
     image:  kedasamples/sample-dotnet-worker-servicebus-queue
     build:
       context: .
-      dockerfile: Keda.Samples.Dotnet.OrderProcessor/Dockerfile
+      dockerfile: Dockerfile.Processor
 
   keda.samples.web:
     image:  kedasamples/sample-dotnet-web
@@ -13,4 +13,4 @@ services:
     - "8000:80"
     build:
       context: .
-      dockerfile: Keda.Samples.DotNet.Web/Dockerfile
+      dockerfile: Dockerfile.Web
