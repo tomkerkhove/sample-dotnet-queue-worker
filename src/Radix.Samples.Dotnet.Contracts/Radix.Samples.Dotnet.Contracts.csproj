@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <LangVersion>12</LangVersion>
-        <RootNamespace>Keda.Samples.Dotnet.Contracts</RootNamespace>
+        <RootNamespace>Radix.Samples.Dotnet.Contracts</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

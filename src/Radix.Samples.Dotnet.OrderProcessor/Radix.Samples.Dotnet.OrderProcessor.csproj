@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <RootNamespace>Keda.Samples.Dotnet.OrderProcessor</RootNamespace>
+    <RootNamespace>Radix.Samples.Dotnet.OrderProcessor</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

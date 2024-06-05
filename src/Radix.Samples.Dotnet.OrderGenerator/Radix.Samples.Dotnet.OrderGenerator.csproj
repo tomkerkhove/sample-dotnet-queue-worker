@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Keda.Samples.Dotnet.OrderGenerator</RootNamespace>
+    <RootNamespace>Radix.Samples.Dotnet.OrderGenerator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
