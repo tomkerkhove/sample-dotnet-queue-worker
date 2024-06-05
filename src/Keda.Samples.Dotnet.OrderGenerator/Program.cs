@@ -3,10 +3,12 @@ using Keda.Samples.Dotnet.Contracts;
 using System;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder();
+builder.Configuration.AddJsonFile("appsettings.local.json", optional: true).AddEnvironmentVariables();
 builder.Services.AddOptions<OrderQueueOptions>().Bind(builder.Configuration.GetSection(nameof(OrderQueueOptions)));
 builder.Services.AddOrderQueueServices();
 var app = builder.Build();
@@ -20,7 +22,7 @@ for (var i = 0; i < orderCount; i++)
     var f = new Faker();
     var customer = new Customer(f.Name.FirstName(), f.Name.LastName());
     var order = new Order(Guid.NewGuid().ToString(),f.Random.Int(),f.Commerce.Product(), customer);
-    
+
     var rawOrder = JsonSerializer.Serialize(order);
     var orderMessage = new ServiceBusMessage(rawOrder);
 

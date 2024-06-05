@@ -6,11 +6,13 @@ using Keda.Samples.Dotnet.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder();
+builder.Configuration.AddJsonFile("appsettings.local.json", optional: true).AddEnvironmentVariables();
 builder.Services.AddOptions<OrderQueueOptions>().BindConfiguration(nameof(OrderQueueOptions));
 builder.Services.AddLogging(lb => lb.AddConsole());
 builder.Services.AddControllers();
