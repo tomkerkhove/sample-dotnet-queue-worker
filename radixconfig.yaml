@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/equinor/radix-operator/release/json-schema/radixapplication.json
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: edc2023-radix-wi-rihag
+spec:
+  environments:
+    - name: prod
+      build:
+        from: forkmain
+  components:
+    - name: web
+      src: src
+      dockerfileName: src/Keda.Samples.DotNet.Web/Dockerfile
+
+      # Workload Identity for the running application:
+      identity:
+        azure:
+          clientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
+
+      publicPort: http
+      ports:
+        - name: http
+          port: 8000
+
+      variables:
+        URLS: http://*:8000
+        ASPNETCORE_ENVIRONMENT: Development
+        OrderQueueOptions__AuthMode: WorkloadIdentity
+        OrderQueueOptions__FullyQualifiedNamespace: rihag-deleteme-edc23.servicebus.windows.net
+        OrderQueueOptions__QueueName: orders
+
+    - name: processor
+      src: src
+      dockerfileName: src/Keda.Samples.DotNet.Processor/Dockerfile
+
+      # Workload Identity for the running application:
+      identity:
+        azure:
+          clientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
+
+      variables:
+        ASPNETCORE_ENVIRONMENT: Development
+        OrderQueueOptions__AuthMode: WorkloadIdentity
+        OrderQueueOptions__FullyQualifiedNamespace: rihag-deleteme-edc23.servicebus.windows.net
+        OrderQueueOptions__QueueName: orders
+
+      horizontalScaling:
+        maxReplicas: 10
+        minReplicas: 0
+        triggers:
+         - name: azuresb
+           azureServiceBus:
+             namespace: rihag-deleteme-edc23 #.servicebus.windows.net
+             queueName: orders
+             messageCount: 2
+
+             # Workload Identity for KEDA to access service bus
+             authentication:
+               identity:
+                 azure:
+                   clientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
