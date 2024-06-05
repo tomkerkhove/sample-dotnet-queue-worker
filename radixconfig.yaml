@@ -23,10 +23,9 @@ spec:
       publicPort: http
       ports:
         - name: http
-          port: 8000
+          port: 8080
 
       variables:
-        URLS: http://*:8000
         ASPNETCORE_ENVIRONMENT: Development
         OrderQueueOptions__FullyQualifiedNamespace: rihag-deleteme-edc23.servicebus.windows.net
         OrderQueueOptions__QueueName: orders
