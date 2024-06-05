@@ -1,4 +1,4 @@
-﻿namespace Keda.Samples.Dotnet.Contracts;
+﻿namespace Radix.Samples.Dotnet.Contracts;
 
 public record Customer(string FirstName, string LastName);
 public record Order(string Id, int Amount, string ArticleNumber, Customer Customer);

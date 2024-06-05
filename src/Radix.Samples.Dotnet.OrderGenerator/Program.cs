@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Keda.Samples.Dotnet.Contracts;
+using Radix.Samples.Dotnet.Contracts;
 using System;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;

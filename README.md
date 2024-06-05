@@ -7,8 +7,54 @@ The message processor will receive a single message at a time (per instance), an
 
 > 💡 *If you want to learn how to scale this sample with KEDA 1.0, feel free to read about it [here](https://github.com/kedacore/sample-dotnet-worker-servicebus-queue/tree/keda-v1.0).*
 
-## Radix Config Trigger details:
+This sample is a refactored version of the one found at https://github.com/kedacore/sample-dotnet-worker-servicebus-queue.
+We Have removed all authentication options, and added AzureDefaultCredentials.
+The sample is also upgraded from Dotnet core 3.1 to Dotnet 8.
 
+## Configuring resources
+
+Configure `terraform.tf` and modify `resource_group_name`, `location`, `name`, and `radix_app_name` (minium).
+
+```shell
+terraform init
+# ...
+terraform apply
+# ...
+# Outputs:
+
+# client_id = "c2f17b62-7c2f-4541-acbc-22d7cfc66e0b"
+# endpoint = "https://<YOUR NAME>.servicebus.windows.net:443/"
+# queue_name = "orders"
+```
+
+Configure `appsettings.json` (or create a `appsettings.local.json`) in `./Radix.Samples.DotNet.Web`, `./Radix.Samples.DotNet.Processor` and `./Radix.Samples.DotNet.Generator`.
+
+Start web server:
+```shell
+cd src/Radix.Samples.DotNet.Web; dotnet run
+```
+
+Start the processor:
+```shell
+cd src/Radix.Samples.Dotnet.OrderProcessor; dotnet run
+```
+
+Generate some events:
+```shell
+cd src/Radix.Samples.Dotnet.OrderGenerator; dotnet run
+# Let's queue some orders, how many do you want?
+# 2
+# Queuing order 719a7b19-f1f7-4f46-a543-8da9bfaf843d - A Hat for Reilly Davis
+# Queuing order 5c3a954c-c356-4cc9-b1d8-e31cd2c04a5a - A Salad for Savanna Rowe
+# That's it, see you later!
+```
+
+## Deployment
+
+Update Radixconfig with your ClientID and endpoint details and enjoy 🎉
+
+
+### Radix Config Trigger details:
 ```yaml
 
   horizontalScaling:
@@ -29,6 +75,8 @@ The message processor will receive a single message at a time (per instance), an
 
 ```
 
+
+### Terraform Keda details:
 Currently Keda needs access to your servicebus to count messages, this has the side effect of other clients also being able to scale their apps based on messages in your queue, if they also know your ClientId.
 
 To configure Keda, create a managed identity, and assign it a federated credential, like this if you are using Terraform:
@@ -42,3 +90,6 @@ resource "azurerm_federated_identity_credential" "keda" {
   parent_id           = azurerm_user_assigned_identity.main.id # Your managed identity that have access to the ServiceBus
 }
 ```
+
+## Cleanup
+To cleanup your resources run `terraform destroy` and delete your app in Radix

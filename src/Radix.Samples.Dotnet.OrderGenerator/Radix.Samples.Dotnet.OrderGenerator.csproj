@@ -4,10 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <OutputType>Exe</OutputType>
+    <RootNamespace>Keda.Samples.Dotnet.OrderGenerator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Keda.Samples.Dotnet.Contracts\Keda.Samples.Dotnet.Contracts.csproj" />
+    <ProjectReference Include="..\Radix.Samples.Dotnet.Contracts\Radix.Samples.Dotnet.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

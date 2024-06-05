@@ -8,7 +8,7 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Keda.Samples.Dotnet.OrderProcessor;
+namespace Radix.Samples.Dotnet.OrderProcessor;
 
 public abstract class QueueWorker<TMessage>(ServiceBusProcessor processor, ILogger<QueueWorker<TMessage>> logger) : BackgroundService
 {
@@ -33,7 +33,7 @@ public abstract class QueueWorker<TMessage>(ServiceBusProcessor processor, ILogg
         logger.LogInformation("Message pump closed : {Time}", DateTimeOffset.UtcNow);
     }
 
-        
+
     private async Task HandleMessageAsync (ProcessMessageEventArgs processMessageEventArgs)
     {
         try

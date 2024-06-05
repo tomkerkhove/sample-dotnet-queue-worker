@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Threading;
 using Azure.Messaging.ServiceBus;
-using Keda.Samples.Dotnet.Contracts;
+using Radix.Samples.Dotnet.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
