@@ -13,6 +13,8 @@ locals {
 
   radix_app_name        = "radix-keda-sample"
   radix_app_env         = "prod"
+
+  # https://console.radix.equinor.com/about
   radix_oidc_issuer_url = "https://northeurope.oic.prod-aks.azure.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/04f44167-e128-4c51-a26c-2589bd33b7ac/"
 }
 

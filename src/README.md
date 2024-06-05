@@ -15,8 +15,7 @@ Build Docker container for order processor
 
 Run order processor locally
 ```shell
-❯ docker run --detach --env OrderQueueOptions__ConnectionString="<connection-string>" keda-sample-dotnet-worker-servicebus-queue
-c6775c9383e56fc16da37b62ebbff0dc44d4019a53d282a1ef260a6d71022a32
+❯ docker run --detach --env OrderQueueOptions__ConnectionString="<connection-string>" keda-sample-dotnet-worker-servicebus-queuec6775c9383e56fc16da37b62ebbff0dc44d4019a53d282a1ef260a6d71022a32
 ```
 
 Let's use the test orders via our `OrderGenerator` tool:

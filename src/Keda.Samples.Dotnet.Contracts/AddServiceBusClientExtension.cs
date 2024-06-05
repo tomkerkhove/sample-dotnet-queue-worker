@@ -42,9 +42,6 @@ public static class AddServiceBusClientExtension
 
     private static ServiceBusClient AuthenticateToAzureServiceBus(OrderQueueOptions options, ILogger logger)
     {
-        Console.WriteLine(options.AuthMode);
-        Console.WriteLine(options.ConnectionString);
-        Console.WriteLine(options.QueueName);
         switch (options.AuthMode)
         {
             case AuthenticationMode.AzureDefaultCredential:
@@ -61,7 +58,7 @@ public static class AddServiceBusClientExtension
                 return new ServiceBusClient(options.FullyQualifiedNamespace, new ManagedIdentityCredential(options.ClientId));
             case AuthenticationMode.WorkloadIdentity:
                 logger.LogInformation("Authentication by using workload identity {ClientId}", options.ClientId);
-                return new ServiceBusClient(options.FullyQualifiedNamespace, new ManagedIdentityCredential(options.ClientId));
+                return new ServiceBusClient(options.FullyQualifiedNamespace, new WorkloadIdentityCredential());
             default:
                 throw new ArgumentOutOfRangeException("AuthMode","AuthMode not supported");
         }
