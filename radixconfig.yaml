@@ -2,7 +2,7 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-  name: edc2023-radix-wi-rihag
+  name: radix-keda-sample
 spec:
   environments:
     - name: prod
