@@ -31,6 +31,7 @@ spec:
         OrderQueueOptions__AuthMode: WorkloadIdentity
         OrderQueueOptions__FullyQualifiedNamespace: rihag-deleteme-edc23.servicebus.windows.net
         OrderQueueOptions__QueueName: orders
+        OrderQueueOptions__ClientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
 
     - name: processor
       src: src
@@ -46,6 +47,8 @@ spec:
         OrderQueueOptions__AuthMode: WorkloadIdentity
         OrderQueueOptions__FullyQualifiedNamespace: rihag-deleteme-edc23.servicebus.windows.net
         OrderQueueOptions__QueueName: orders
+        OrderQueueOptions__ClientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
+
 
       horizontalScaling:
         maxReplicas: 10

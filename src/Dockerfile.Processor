@@ -10,7 +10,7 @@ RUN dotnet build "Keda.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /app
 FROM build AS publish
 RUN dotnet publish "Keda.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/runtime:8.0
 WORKDIR /app
 COPY --from=publish /app .
 USER 1000
