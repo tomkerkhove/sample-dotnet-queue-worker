@@ -7,7 +7,7 @@ spec:
   environments:
     - name: prod
       build:
-        from: forkmain
+        from: main
   components:
     - name: web
       src: src
