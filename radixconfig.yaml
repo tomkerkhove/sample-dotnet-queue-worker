@@ -8,6 +8,8 @@ spec:
     - name: prod
       build:
         from: main
+  build:
+    useBuildKit: true
   components:
     - name: web
       src: src
