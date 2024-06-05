@@ -367,7 +367,7 @@ To build and run the web app locally, add the service bus connection string to a
 There is also a docker image available, so you can also run it locally with the following command:
 
 ```cli
-docker run -p 8080:80 -d -e OrderQueue__ConnectionString="KEDA_SERVICEBUS_QUEUE_CONNECTIONSTRING" kedasamples/sample-dotnet-web 
+docker run -p 8080:80 -d -e OrderQueue__ConnectionString="<connection-string>" kedasamples/sample-dotnet-web 
 ```
 
 To deploy the web application to your Kubernetes cluster:
@@ -413,7 +413,7 @@ Run the following command with app ids of both created Azure AD applications.
 ```cli
 ❯ az ad app delete --id <app-id>
 ```
-
+ 
 ### Uninstall KEDA
 
 ```cli
