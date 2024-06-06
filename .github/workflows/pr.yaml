@@ -1,0 +1,19 @@
+name: PR Tests
+on:
+  pull_request:
+jobs:
+  validate-radixconfig:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Get Azure principal token for Radix'
+        run: |
+          echo "::add-mask::$token"
+          echo "APP_SERVICE_ACCOUNT_TOKEN=hello-world" >> $GITHUB_ENV
+          
+      - name: 'Validate public-site'
+        uses: equinor/radix-github-actions@v1
+        with:
+          args: validate radix-config --config-file radixconfig.yaml

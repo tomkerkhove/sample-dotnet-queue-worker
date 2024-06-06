@@ -13,8 +13,8 @@ spec:
   components:
     - name: web
       src: src
-#      runtime:
-#        architecture: arm64
+      #      runtime:
+      #        architecture: arm64
       dockerfileName: Dockerfile.Web
 
       # Workload Identity for the running application:
@@ -39,8 +39,8 @@ spec:
     - name: processor
       src: src
       dockerfileName: Dockerfile.Processor
-#      runtime:
-#        architecture: arm64
+      #      runtime:
+      #        architecture: arm64
 
       # Workload Identity for the running application:
       identity:
@@ -57,14 +57,14 @@ spec:
         maxReplicas: 10
         minReplicas: 0
         triggers:
-         - name: azuresb
-           azureServiceBus:
-             namespace: your-service-bus-namespace #.servicebus.windows.net  # FIXME
-             queueName: orders
-             messageCount: 2
+          - name: azuresb
+            azureServiceBus:
+              namespace: your-service-bus-namespace #.servicebus.windows.net  # FIXME
+              queueName: orders
+              messageCount: 2
 
-             # Workload Identity for KEDA to access service bus
-             authentication:
-               identity:
-                 azure:
-                   clientId: 00000000-0000-0000-0000-000000000000  # FIXME
+              # Workload Identity for KEDA to access service bus
+              authentication:
+                identity:
+                  azure:
+                    clientId: 00000000-0000-0000-0000-000000000000  # FIXME
