@@ -56,23 +56,31 @@ Update Radixconfig with your ClientID and endpoint details and enjoy 🎉
 
 ### Radix Config Trigger details:
 ```yaml
+metadata:
+  name: <Your Radix App Name> # Change this!
+  components:
 
-  horizontalScaling:
-    maxReplicas: 10
-    minReplicas: 0 # When you are using atleast 1 non-resource based trigger, you can scale to 0 when possible!
-    triggers:
-     - name: azuresb
-       azureServiceBus:
-         namespace: <AzureServiceBusNamespace> #.servicebus.windows.net
-         queueName: orders
-         messageCount: 2 # How many messages should each replica handle? 
-
-         # Workload Identity for KEDA to access service bus
-         authentication:
-           identity:
-             azure:
-               clientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
-
+    - name: web
+      horizontalScaling:
+        # defaults to using CPU scaling with 80% target utilization, and min 1 replica
+        maxReplicas: 3 
+        
+    - name: processor
+      horizontalScaling:
+        maxReplicas: 10
+        minReplicas: 0
+        triggers:
+         - name: azuresb
+           azureServiceBus:
+             namespace: <AzureServiceBusNamespace> #.servicebus.windows.net
+             queueName: orders
+             messageCount: 2 # How many messages should each replica handle? 
+    
+             # Workload Identity for KEDA to access service bus
+             authentication:
+               identity:
+                 azure:
+                   clientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
 ```
 
 

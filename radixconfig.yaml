@@ -20,6 +20,10 @@ spec:
         azure:
           clientId: c2f17b62-7c2f-4541-acbc-22d7cfc66e0b
 
+      horizontalScaling:
+        # defaults to using CPU scaling with 80% target utilization, and min 1 replica
+        maxReplicas: 3
+
       publicPort: http
       ports:
         - name: http
