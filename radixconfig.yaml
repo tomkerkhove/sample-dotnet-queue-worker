@@ -20,7 +20,7 @@ spec:
       # Workload Identity for the running application:
       identity:
         azure:
-          clientId: 00000000-0000-0000-0000-000000000000
+          clientId: 00000000-0000-0000-0000-000000000000 # FIXME
 
       horizontalScaling:
         # defaults to using CPU scaling with 80% target utilization, and min 1 replica
@@ -33,7 +33,7 @@ spec:
 
       variables:
         ASPNETCORE_ENVIRONMENT: Development
-        OrderQueueOptions__FullyQualifiedNamespace: <Your service bus namespace>.servicebus.windows.net
+        OrderQueueOptions__FullyQualifiedNamespace: your-service-bus-namespace.servicebus.windows.net # FIXME
         OrderQueueOptions__QueueName: orders
 
     - name: processor
@@ -45,11 +45,11 @@ spec:
       # Workload Identity for the running application:
       identity:
         azure:
-          clientId: 00000000-0000-0000-0000-000000000000
+          clientId: 00000000-0000-0000-0000-000000000000  # FIXME
 
       variables:
         ASPNETCORE_ENVIRONMENT: Development
-        OrderQueueOptions__FullyQualifiedNamespace: <Your service bus namespace>.servicebus.windows.net
+        OrderQueueOptions__FullyQualifiedNamespace: your-service-bus-namespace.servicebus.windows.net # FIXME
         OrderQueueOptions__QueueName: orders
 
 
@@ -59,7 +59,7 @@ spec:
         triggers:
          - name: azuresb
            azureServiceBus:
-             namespace: <Your service bus namespace> #.servicebus.windows.net
+             namespace: your-service-bus-namespace #.servicebus.windows.net  # FIXME
              queueName: orders
              messageCount: 2
 
@@ -67,4 +67,4 @@ spec:
              authentication:
                identity:
                  azure:
-                   clientId: 00000000-0000-0000-0000-000000000000
+                   clientId: 00000000-0000-0000-0000-000000000000  # FIXME
