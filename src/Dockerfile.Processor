@@ -1,17 +1,17 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-COPY ["Radix.Samples.Dotnet.OrderProcessor/Radix.Samples.Dotnet.OrderProcessor.csproj", "Radix.Samples.Dotnet.OrderProcessor/"]
-COPY ["Radix.Samples.Dotnet.Contracts/Radix.Samples.Dotnet.Contracts.csproj", "Radix.Samples.Dotnet.Contracts/"]
+FROM cgr.dev/chainguard/dotnet-sdk:latest AS build
+WORKDIR /home/nonroot/src
+USER 65532
+COPY --chown=65532 ["Radix.Samples.Dotnet.OrderProcessor/Radix.Samples.Dotnet.OrderProcessor.csproj", "Radix.Samples.Dotnet.OrderProcessor/"]
+COPY --chown=65532 ["Radix.Samples.Dotnet.Contracts/Radix.Samples.Dotnet.Contracts.csproj", "Radix.Samples.Dotnet.Contracts/"]
 RUN dotnet restore "Radix.Samples.Dotnet.OrderProcessor/Radix.Samples.Dotnet.OrderProcessor.csproj"
-COPY . .
-WORKDIR "/src/Radix.Samples.Dotnet.OrderProcessor"
-RUN dotnet build "Radix.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /app
+COPY --chown=65532 . .
+WORKDIR "/home/nonroot/src/Radix.Samples.Dotnet.OrderProcessor"
+RUN dotnet build "Radix.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /home/nonroot/app
 
 FROM build AS publish
-RUN dotnet publish "Radix.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /app
+RUN dotnet publish "Radix.Samples.Dotnet.OrderProcessor.csproj" -c Release -o /home/nonroot/app
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0
-WORKDIR /app
-COPY --from=publish /app .
-USER 1000
+FROM cgr.dev/chainguard/dotnet-runtime:latest
+WORKDIR /home/nonroot
+COPY --from=build /home/nonroot/app .
 ENTRYPOINT ["dotnet", "Radix.Samples.Dotnet.OrderProcessor.dll"]
