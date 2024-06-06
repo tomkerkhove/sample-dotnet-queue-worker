@@ -1,9 +1,3 @@
-﻿namespace Keda.Samples.Dotnet.Contracts
-{
-    public class Customer
-    {
-        public string FirstName { get; set; }
+namespace Keda.Samples.Dotnet.Contracts;
 
-        public string LastName { get; set; }
-    }
-}
+public record Customer(string FirstName, string LastName);

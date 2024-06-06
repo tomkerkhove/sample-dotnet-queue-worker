@@ -1,10 +1,4 @@
-﻿namespace Keda.Samples.Dotnet.Contracts
-{
-    public class Order
-    {
-        public string Id { get; set; }
-        public int Amount { get; set; }
-        public string ArticleNumber { get; set; }
-        public Customer Customer { get; set; }
-    }
-}
+namespace Keda.Samples.Dotnet.Contracts;
+
+
+public record Order(string Id, int Amount, string ArticleNumber, Customer Customer);
