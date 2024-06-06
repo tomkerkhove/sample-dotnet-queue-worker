@@ -1,21 +1,21 @@
 provider "azurerm" {
-  subscription_id = "16ede44b-1f74-40a5-b428-46cca9a5741b"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # FIXME
   features {}
 }
 
 locals {
-  location            = "North Europe"
-  resource_group_name = "test-resources"
+  location            = "North Europe"   #FIXME
+  resource_group_name = "test-resources" #FIXME
 
-  name            = "rihag-deleteme-edc23"
+  name            = "<Your service bus namespace>" #FIXME
   queue_name      = "orders"
   managed_id_name = "radix-sample-keda"
 
-  radix_app_name        = "radix-keda-sample"
-  radix_app_env         = "prod"
+  radix_app_name = "radix-keda-sample"
+  radix_app_env  = "prod"
 
   # https://console.radix.equinor.com/about
-  radix_oidc_issuer_url = "https://northeurope.oic.prod-aks.azure.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/04f44167-e128-4c51-a26c-2589bd33b7ac/"
+  radix_oidc_issuer_url = "https://northeurope.oic.prod-aks.azure.com/00000000-0000-0000-0000-000000000000/00000000-0000-0000-0000-000000000000/" #FIXME
 }
 
 output "client_id" {
