@@ -85,7 +85,6 @@ metadata:
 
 
 ### Terraform Keda details:
-Currently Keda needs access to your servicebus to count messages, this has the side effect of other clients also being able to scale their apps based on messages in your queue, if they also know your ClientId.
 
 To configure Keda, create a managed identity, and assign it a federated credential, like this if you are using Terraform:
 ```terraform
@@ -98,6 +97,10 @@ resource "azurerm_federated_identity_credential" "keda" {
   parent_id           = azurerm_user_assigned_identity.main.id # Your managed identity that have access to the ServiceBus
 }
 ```
+
+> ⚠️ Giving Keda access to your servicebus to count messages eables any other Radix Application to scale their apps based on messages in your queues.
+> 
+> Note: This does not give their app access to your ServiceBus, only the trigger to read the count of messages.
 
 ## Cleanup
 To cleanup your resources run `terraform destroy` and delete your app in Radix

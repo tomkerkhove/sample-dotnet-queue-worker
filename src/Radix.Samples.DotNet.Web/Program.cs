@@ -17,7 +17,6 @@ builder.Services.AddOptions<OrderQueueOptions>().BindConfiguration(nameof(OrderQ
 builder.Services.AddLogging(lb => lb.AddConsole());
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
-builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOrderQueueServices();
